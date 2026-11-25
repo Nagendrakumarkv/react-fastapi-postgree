@@ -133,3 +133,166 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Task Management */
+
+.task-section {
+  margin-top: 35px;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.task-heading {
+  margin-bottom: 20px;
+}
+
+.task-heading p {
+  color: #64748b;
+  margin-top: 7px;
+}
+
+/* Task Form */
+
+.task-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.task-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+}
+
+.task-form input:focus {
+  border-color: #2563eb;
+}
+
+.task-form button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.task-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Filters */
+
+.task-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  padding: 9px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.filter-button.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Task List */
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.task-details {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.task-details small {
+  color: #64748b;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-actions select {
+  padding: 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.delete-button {
+  padding: 9px 13px;
+  color: #dc2626;
+  background: #fee2e2;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Empty State */
+
+.empty-state {
+  padding: 35px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.empty-state p {
+  margin-top: 8px;
+  color: #64748b;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .task-section {
+    padding: 15px;
+  }
+
+  .task-form {
+    flex-direction: column;
+  }
+
+  .task-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .task-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
