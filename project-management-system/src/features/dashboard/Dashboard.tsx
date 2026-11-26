@@ -1,4 +1,9 @@
-import { useState } from 'react';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback
+} from 'react';
 
 import type {
   Task,
@@ -6,12 +11,14 @@ import type {
   TaskFilter
 } from '../../types/task';
 
+import useDebounce from '../../hooks/useDebounce';
+
 import StatCard from '../../components/dashboard/StatCard';
 import TaskForm from '../../components/dashboard/TaskForm';
 import TaskList from '../../components/dashboard/TaskList';
+import TaskSearch from '../../components/dashboard/TaskSearch';
 
-// Temporary demo data.
-// We'll replace this with FastAPI data on Day 6.
+// Initial demo tasks
 const initialTasks: Task[] = [
   {
     id: 'task-1',
@@ -30,19 +37,39 @@ const initialTasks: Task[] = [
     title: 'Integrate REST APIs',
     status: 'Pending',
     createdAt: new Date().toISOString()
+  },
+  {
+    id: 'task-4',
+    title: 'Implement authentication',
+    status: 'Pending',
+    createdAt: new Date().toISOString()
   }
 ];
 
 function Dashboard() {
 
-  // Main task state
+  // 1. Task state
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
-  // Current task filter
+  // 2. Status filter
   const [filter, setFilter] = useState<TaskFilter>('All');
 
-  // Add new task
-  function handleAddTask(title: string) {
+  // 3. Search input state
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // 4. Debounced search value
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+  // 5. Update browser title
+  useEffect(() => {
+
+    document.title =
+      `ProjectHub | ${tasks.length} Tasks`;
+
+  }, [tasks.length]);
+
+  // 6. Add task
+  const handleAddTask = useCallback((title: string) => {
 
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -55,13 +82,15 @@ function Dashboard() {
       newTask,
       ...previousTasks
     ]);
-  }
 
-  // Update task status
-  function handleStatusChange(
+  }, []);
+
+  // 7. Update task status
+  const handleStatusChange = useCallback((
     id: string,
     status: TaskStatus
-  ) {
+  ) => {
+
     setTasks((previousTasks) =>
       previousTasks.map((task) =>
         task.id === id
@@ -69,34 +98,64 @@ function Dashboard() {
           : task
       )
     );
-  }
 
-  // Delete task
-  function handleDeleteTask(id: string) {
+  }, []);
+
+  // 8. Delete task
+  const handleDeleteTask = useCallback((id: string) => {
+
     setTasks((previousTasks) =>
       previousTasks.filter((task) => task.id !== id)
     );
-  }
 
-  // Calculate dashboard statistics
-  const totalTasks = tasks.length;
+  }, []);
 
-  const completedTasks = tasks.filter(
-    (task) => task.status === 'Completed'
-  ).length;
+  // 9. Calculate statistics using useMemo
+  const statistics = useMemo(() => {
 
-  const activeTasks = tasks.filter(
-    (task) => task.status === 'In Progress'
-  ).length;
+    return {
+      total: tasks.length,
 
-  const pendingTasks = tasks.filter(
-    (task) => task.status === 'Pending'
-  ).length;
+      completed: tasks.filter(
+        (task) => task.status === 'Completed'
+      ).length,
 
-  // Filter tasks based on selected status
-  const filteredTasks = tasks.filter((task) =>
-    filter === 'All' || task.status === filter
-  );
+      active: tasks.filter(
+        (task) => task.status === 'In Progress'
+      ).length,
+
+      pending: tasks.filter(
+        (task) => task.status === 'Pending'
+      ).length
+    };
+
+  }, [tasks]);
+
+  // 10. Filter tasks using useMemo
+  const filteredTasks = useMemo(() => {
+
+    const normalizedSearch = debouncedSearch
+      .trim()
+      .toLowerCase();
+
+    return tasks.filter((task) => {
+
+      const matchesStatus =
+        filter === 'All' || task.status === filter;
+
+      const matchesSearch =
+        task.title.toLowerCase().includes(normalizedSearch);
+
+      return matchesStatus && matchesSearch;
+
+    });
+
+  }, [tasks, filter, debouncedSearch]);
+
+  // 11. Update search value
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
 
   return (
     <main className="dashboard">
@@ -106,50 +165,57 @@ function Dashboard() {
         <p>Manage and track your team's tasks.</p>
       </div>
 
-      {/* Dashboard Statistics */}
+      {/* Dashboard statistics */}
 
       <div className="stats-grid">
 
         <StatCard
           title="Total Tasks"
-          value={totalTasks}
+          value={statistics.total}
           description="All assigned tasks"
         />
 
         <StatCard
           title="In Progress"
-          value={activeTasks}
+          value={statistics.active}
           description="Currently working"
         />
 
         <StatCard
           title="Completed"
-          value={completedTasks}
+          value={statistics.completed}
           description="Successfully completed"
         />
 
         <StatCard
           title="Pending"
-          value={pendingTasks}
+          value={statistics.pending}
           description="Waiting to start"
         />
 
       </div>
 
-      {/* Task Management */}
+      {/* Task management */}
 
       <section className="task-section">
 
         <div className="task-heading">
-          <div>
-            <h2>Task Management</h2>
-            <p>Create and manage your tasks.</p>
-          </div>
+          <h2>Task Management</h2>
+          <p>Create, search and manage tasks.</p>
         </div>
+
+        {/* Create task */}
 
         <TaskForm onAddTask={handleAddTask} />
 
-        {/* Task Filters */}
+        {/* Search tasks */}
+
+        <TaskSearch
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+
+        {/* Filter tasks */}
 
         <div className="task-filters">
 
@@ -173,7 +239,7 @@ function Dashboard() {
 
         </div>
 
-        {/* Task List */}
+        {/* Display tasks */}
 
         <TaskList
           tasks={filteredTasks}

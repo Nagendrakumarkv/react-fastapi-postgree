@@ -1,4 +1,9 @@
-import type { Task, TaskStatus } from '../../types/task';
+import { memo } from 'react';
+
+import type {
+  Task,
+  TaskStatus
+} from '../../types/task';
 
 interface TaskItemProps {
   task: Task;
@@ -6,7 +11,7 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
 }
 
-function TaskItem({
+const TaskItem = memo(function TaskItem({
   task,
   onStatusChange,
   onDelete
@@ -53,6 +58,6 @@ function TaskItem({
 
     </div>
   );
-}
+});
 
 export default TaskItem;
