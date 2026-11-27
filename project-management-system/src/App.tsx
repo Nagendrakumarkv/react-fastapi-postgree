@@ -1,10 +1,13 @@
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
+
 import Dashboard from './features/dashboard/Dashboard';
+import Projects from './features/projects/Projects';
 
 import './App.css';
 
 function App() {
+
   return (
     <div className="app-container">
 
@@ -15,6 +18,8 @@ function App() {
         <Header title="Project Management System" />
 
         <Dashboard />
+
+        <Projects />
 
       </div>
 
